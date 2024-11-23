@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<robot name="grua">
+
+  <!-- Color of materials -->
+  <material name="yellow">
+    <color rgba="1 0.85 0 1"/>
+  </material>
+  <material name="black">
+    <color rgba="0.5 0.5 0.5 1"/>
+  </material>
+  
+  <link name="link0">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot-grua/urdf/stl_parts/base.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black" />
+    </visual>
+  </link>
+  
+  <joint name="joint_01" type="revolute">
+    <parent link="link0"/>
+    <child link="link1"/>
+    <origin xyz="0 0 0"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="link1">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot-grua/urdf/stl_parts/link1.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="yellow" />
+    </visual>
+  </link>
+  
+  <joint name="joint_12" type="prismatic">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="0 0 2.8"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="0" upper="0.7"/>
+  </joint>
+
+  <link name="link2">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot-grua/urdf/stl_parts/link2.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black" />
+    </visual>
+  </link>
+  
+  <joint name="joint_23" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="0 0 1.2"/>
+    <axis xyz="1 0 0" />
+    <limit effort="300" velocity="0.1" lower="-0.87" upper="0.52"/>
+  </joint>
+
+  <link name="link3">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot-grua/urdf/stl_parts/link3.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="yellow" />
+    </visual>
+  </link>
+  
+  <joint name="joint_34" type="prismatic">
+    <parent link="link3"/>
+    <child link="link4"/>
+    <origin xyz="0 1 0"/>
+    <axis xyz="0 1 0" />
+    <limit effort="300" velocity="0.1" lower="0" upper="1.0"/>
+  </joint>
+
+  <link name="link4">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot-grua/urdf/stl_parts/link4.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black" />
+    </visual>
+  </link>
+  
+  <joint name="joint_45" type="revolute">
+    <parent link="link4"/>
+    <child link="link5"/>
+    <origin xyz="0 1.2 0"/>
+    <axis xyz="1 0 0" />
+    <limit effort="300" velocity="0.1" lower="-0.25" upper="0.25"/>
+  </joint>
+
+  <link name="link5">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot-grua/urdf/stl_parts/link5.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="yellow" />
+    </visual>
+  </link>
+  
+  <joint name="joint_56" type="revolute">
+    <parent link="link5"/>
+    <child link="link6"/>
+    <origin xyz="0 0 -0.4"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="link6">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot-grua/urdf/stl_parts/link6.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black" />
+    </visual>
+  </link>
+
+</robot>
