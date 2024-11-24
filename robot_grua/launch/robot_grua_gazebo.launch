@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="paused" default="false"/>
+  <arg name="use_sim_time" default="true"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_sim_time" value="$(arg use_sim_time)"/>
+    <arg name="headless" value="$(arg headless)"/>
+  </include>
+  
+  <arg name="joint_01_effort" default="300"/>
+  <arg name="joint_12_effort" default="1000"/>
+
+  <!-- Load the URDF -->
+  <!-- <param name="robot_description"
+  	 textfile="$(find robot_grua)/urdf/robot_grua_gazebo.urdf" /> -->
+  <param name="robot_description"
+  	 command="$(find xacro)/xacro --inorder '$(find robot_grua)/urdf/robot_grua.xacro' 
+  	 			joint_01_effort:=$(arg joint_01_effort)
+  	 			joint_12_effort:=$(arg joint_12_effort)" />
+
+  <!-- Spawn a URDF robot -->
+  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false"
+        output="screen" args="-urdf -model robot_grua -param robot_description "/>
+
+</launch>

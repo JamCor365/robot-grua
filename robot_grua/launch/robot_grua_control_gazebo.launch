@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Launch Gazebo  -->
+  <include file="$(find robot_grua)/launch/robot_grua_gazebo.launch" />
+  
+  <!-- Joint controller configurations from YAML to parameter server -->
+  <rosparam file="$(find robot_grua)/config/controllers.yaml" command="load"/>
+
+  <!-- Load the controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner"
+        respawn="false" output="screen" ns="/robot_grua"
+        args="joint_01_position_controller
+              joint_12_position_controller
+              joint_23_position_controller
+              joint_state_controller"/>
+
+  <!-- convert joint states to TF transforms for rviz, etc -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher"
+        type="robot_state_publisher"
+        respawn="false" output="screen">
+    <remap from="/joint_states" to="/robot_grua/joint_states" />
+  </node>
+</launch>

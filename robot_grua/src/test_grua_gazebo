@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+import rospy
+from std_msgs.msg import Float64
+
+if __name__ == "__main__":
+ rospy.init_node("robot_grua_controller")
+
+ # Crear publicadores para cada articulación
+ #pub_joint_01 = rospy.Publisher('/robot_grua/joint_01_position_controller/command', Float64, queue_size=10)
+ pub_joint_12 = rospy.Publisher('/robot_grua/joint_12_position_controller/command', Float64, queue_size=10)
+ #pub_joint_23 = rospy.Publisher('/robot_grua/joint_23_position_controller/command', Float64, queue_size=10)
+ #pub_joint_34 = rospy.Publisher('/robot_grua/joint_34_position_controller/command', Float64, queue_size=10)
+ #pub_joint_45 = rospy.Publisher('/robot_grua/joint_45_position_controller/command', Float64, queue_size=10)
+ #pub_joint_56 = rospy.Publisher('/robot_grua/joint_56_position_controller/command', Float64, queue_size=10)
+
+ # Esperar a que los publicadores se conecten con los suscriptores
+ rospy.sleep(1)
+ #rate = rospy.Rate(10)  # 10 Hz
+
+ # Definir las posiciones deseadas para cada articulación
+ desired_positions = {
+  "joint_01": 3.0,
+  "joint_12": 0.5,
+  "joint_23": 0.2,
+  "joint_34": 0.2,
+  "joint_45": 0.0,
+  "joint_56": 0.0
+ }
+
+ # Publicar las posiciones deseadas
+ rospy.loginfo("Estableciendo posiciones deseadas...")
+ #pub_joint_01.publish(desired_positions["joint_01"])
+ pub_joint_12.publish(desired_positions["joint_12"])
+ #pub_joint_23.publish(desired_positions["joint_23"])
+ #pub_joint_34.publish(desired_positions["joint_34"])
+ #pub_joint_45.publish(desired_positions["joint_45"])
+ #pub_joint_56.publish(desired_positions["joint_56"])
+
+ rospy.loginfo("Posiciones establecidas. El robot debería moverse a la configuración deseada.")
+
+ # Mantener el nodo activo el tiempo necesario
+ rospy.sleep(5)
+ #rospy.spin()

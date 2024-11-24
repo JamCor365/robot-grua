@@ -1,0 +1,37 @@
+robot_grua:
+  # Publish all joint states --------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  # Position Controllers ------------------------------
+  joint_01_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_01
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+    
+  joint_12_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_12
+    pid: {p: 800.0, i: 0.00, d: 100.0}
+    
+  joint_23_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_23
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+    
+  joint_34_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_34
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+    
+  joint_45_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_45
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+    
+  joint_56_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: joint_56
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+    

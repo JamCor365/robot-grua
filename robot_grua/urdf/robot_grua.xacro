@@ -1,0 +1,315 @@
+<?xml version="1.0"?>
+<robot name="robot_grua" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Color of materials -->
+  <material name="yellow">
+    <color rgba="1 0.85 0 1"/>
+  </material>
+  <material name="black">
+    <color rgba="0.5 0.5 0.5 1"/>
+  </material>
+  
+  <xacro:property name="joint_01_effort" value="300" />
+  <xacro:property name="joint_12_effort" value="1000" />
+  <xacro:property name="joint_23_effort" value="300" />
+  
+  <link name="link0">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/base.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/base.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="38.72" />
+      <origin xyz="0 0 0.098" rpy="0 0 0"/>
+      <inertia ixx="7.04" ixy="0.0" ixz="0.0" iyy="7.04" iyz="0.0" izz="13.82" />
+    </inertial>
+  </link>
+  <gazebo reference="link0">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  
+  <joint name="joint_01" type="revolute">
+    <parent link="link0"/>
+    <child link="link1"/>
+    <origin xyz="0 0 0"/>
+    <axis xyz="0 0 1" />
+    <limit effort="${joint_01_effort}" velocity="1.0" lower="-3.1" upper="3.1"/>
+    <dynamics damping="10" friction="0.1"/>
+  </joint>
+
+  <link name="link1">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link1.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="yellow" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link1.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="23.182" />
+      <origin xyz="0 0 1.511" rpy="0 0 0"/>
+      <inertia ixx="20.568" ixy="0.0" ixz="0.0" iyy="20.568" iyz="0.0" izz="2.01" />
+    </inertial>
+  </link>
+  <gazebo reference="link1">
+    <material>Gazebo/Yellow</material>
+  </gazebo>
+  
+  <joint name="joint_12" type="prismatic">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="0 0 2.8"/>
+    <axis xyz="0 0 1" />
+    <limit effort="${joint_12_effort}" velocity="1.0" lower="0" upper="0.7"/>
+    <dynamics damping="10" friction="0.1"/>
+  </joint>
+
+  <link name="link2">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link2.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link2.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="3.646" />
+      <origin xyz="0 0 0.829" rpy="0 0 0"/>
+      <inertia ixx="0.943" ixy="0.0" ixz="0.0" iyy="0.942" iyz="0.0" izz="0.158" />
+    </inertial>
+  </link>
+  <gazebo reference="link2">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  
+  <joint name="joint_23" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="0 0 1.2"/>
+    <axis xyz="1 0 0" />
+    <limit effort="${joint_23_effort}" velocity="1.0" lower="-0.87" upper="0.52"/>
+    <dynamics damping="10" friction="0.1"/>
+  </joint>
+
+  <link name="link3">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link3.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="yellow" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link3.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="16.03" />
+      <origin xyz="0 -0.27 -0.215" rpy="0 0 0"/>
+      <inertia ixx="28.07" ixy="0.0" ixz="0.0" iyy="4.16" iyz="-3.556" izz="27.568" />
+    </inertial>
+  </link>
+  <gazebo reference="link3">
+    <material>Gazebo/Yellow</material>
+  </gazebo>
+  
+  <joint name="joint_34" type="prismatic">
+    <parent link="link3"/>
+    <child link="link4"/>
+    <origin xyz="0 1 0"/>
+    <axis xyz="0 1 0" />
+    <limit effort="300" velocity="1.0" lower="0" upper="1.0"/>
+    <dynamics damping="10" friction="0.1"/>
+  </joint>
+
+  <link name="link4">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link4.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link4.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.513" />
+      <origin xyz="0 0.691 0" rpy="0 0 0"/>
+      <inertia ixx="0.264" ixy="0.0" ixz="0.0" iyy="0.082" iyz="0.0" izz="0.306" />
+    </inertial>
+  </link>
+  <gazebo reference="link4">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  
+  <joint name="joint_45" type="revolute">
+    <parent link="link4"/>
+    <child link="link5"/>
+    <origin xyz="0 1.2 0"/>
+    <axis xyz="1 0 0" />
+    <limit effort="300" velocity="1.0" lower="-0.25" upper="0.25"/>
+    <dynamics damping="10" friction="0.1"/>
+  </joint>
+
+  <link name="link5">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link5.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="yellow" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link5.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.076" />
+      <origin xyz="0 0 -0.23" rpy="0 0 0"/>
+      <inertia ixx="0.003" ixy="0.0" ixz="0.0" iyy="0.009" iyz="0.0" izz="0.007" />
+    </inertial>
+  </link>
+  <gazebo reference="link5">
+    <material>Gazebo/Yellow</material>
+  </gazebo>
+  
+  <joint name="joint_56" type="revolute">
+    <parent link="link5"/>
+    <child link="link6"/>
+    <origin xyz="0 0 -0.4"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="1.0" lower="-3.1" upper="3.1"/>
+    <dynamics damping="10" friction="0.1"/>
+  </joint>
+
+  <link name="link6">
+    <visual>
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link6.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="black" />
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://robot_grua/urdf/stl_parts/link6.stl" scale="0.01 0.01 0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.089" />
+      <origin xyz="0 0 -0.138" rpy="0 0 0"/>
+      <inertia ixx="0.003" ixy="0.0" ixz="0.0" iyy="0.003" iyz="0.0" izz="0.006" />
+    </inertial>
+  </link>
+  <gazebo reference="link6">
+    <material>Gazebo/Grey</material>
+  </gazebo>
+  
+  
+  <!-- Transmissions -->
+  <transmission name="tran_joint_01">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint_01">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_01">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="trans_joint_12">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint_12">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_12">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <transmission name="trans_joint_23">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint_23">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_23">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <transmission name="trans_joint_34">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint_34">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_34">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  <transmission name="tran_joint_45">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint_45">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_45">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="trans_joint_56">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="joint_56">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="motor_56">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  
+  
+  <!-- Plugin: ros_control -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/robot_grua</robotNamespace>
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo>
+
+</robot>
