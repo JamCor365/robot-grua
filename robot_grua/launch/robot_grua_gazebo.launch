@@ -22,7 +22,7 @@
   <!-- <param name="robot_description"
   	 textfile="$(find robot_grua)/urdf/robot_grua_gazebo.urdf" /> -->
   <param name="robot_description"
-  	 command="$(find xacro)/xacro --inorder '$(find robot_grua)/urdf/robot_grua.xacro' 
+  	 command="$(find xacro)/xacro --inorder '$(find robot_grua)/urdf/robot_grua_gazebo.xacro' 
   	 			joint_01_effort:=$(arg joint_01_effort)
   	 			joint_12_effort:=$(arg joint_12_effort)" />
 

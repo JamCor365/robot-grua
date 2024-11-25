@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+import rospy
+from sensor_msgs.msg import JointState
+
+from markers import *
+from gruafunctions import *
+
+def menu():
+ print("\n--- Plataforma de Control del Robot ---")
+ print("Seleccione una opcion:")
+ print("1. Cinematica Directa")
+ print("2. Cinematica Inversa")
+ print("3. Salir")
+ opcion = input("Ingrese su eleccion: ")
+ return opcion
+
+if __name__ == '__main__':
+
+ rospy.init_node("testRobotGrua")
+ pub = rospy.Publisher('joint_states', JointState, queue_size=1)
+ bmarker      = BallMarker(color['PINK'])
+ bmarker_des  = BallMarker(color['CYAN'])
+ marker = FrameMarker()
+  
+ # Joint names
+ jnames = ['joint_01', 'joint_12', 'joint_23','joint_34', 'joint_45', 'joint_56']
+ # Initial Joint Configuration
+ q0 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+ 
+ # Object (message) whose type is JointState
+ jstate = JointState()
+ # Set values to the message
+ jstate.header.stamp = rospy.Time.now()
+ jstate.name = jnames
+ 
+ # Loop rate (in Hz)
+ freq = 20
+ rate = rospy.Rate(freq)
+ 
+ # Continuous execution loop
+ while not rospy.is_shutdown():
+  opcion = menu()
+  
+  if opcion == "1":  # Cinemática Directa
+   print("\n--- CINEMATICA DIRECTA ---")
+   try:
+    print("Ingrese las 6 articulaciones actuales separados por espacio:")
+    print("Rango: [-3.1, 0, -0.87, 0, -0.25, -3.1] to [3.1, 0.7, 0.52, 1, 0.25, 3.1]")
+    q_input = input()  # Lee la entrada del usuario
+    q = np.array([float(val) for val in q_input.split()])
+    if len(q) != 6:
+     raise ValueError("Las articulaciones son seis valores")
+
+    print(f"Configuracion actual de las articulaciones: {np.round(q, 3)}")
+    
+    # End effector with respect to the base
+    T = fkine(q)
+    print( np.round(T, 3) )
+    bmarker.position(T)
+ 
+    x0 = TF2xyzquat(T)
+    marker.setPose(x0)
+
+    # Publicar el estado articular
+    jstate.header.stamp = rospy.Time.now()
+    jstate.position = q
+    pub.publish(jstate)
+    bmarker.publish()
+    marker.publish()
+
+   except ValueError as e:
+    print(f"Error: {e}")
+    
+  elif opcion == "2":  # Cinemática Inversa
+   print("\n--- CINEMATICA INVERSA ---")
+   try:
+    print("Ingrese la posicion deseada (x, y, z) separados por espacio:")
+    xd_input = input()  # Lee la entrada del usuario
+    xd = np.array([float(val) for val in xd_input.split()])
+    if len(xd) != 3:
+     raise ValueError("La posicion deseada debe tener exactamente tres valores: x, y, z.")
+
+    # Inverse kinematics
+    q = ikine(xd, q0)
+
+    # Resulting position (end effector with respect to the base link)
+    T = fkine(q)
+    print('Obtained value:\n', np.round(T,3))
+    
+    x0 = TF2xyzquat(T)
+    marker.setPose(x0)
+
+    # Red marker shows the achieved position
+    bmarker.xyz(T[0:3,3])
+    # Green marker shows the desired position
+    bmarker_des.xyz(xd)
+
+
+    # Publicar el estado articular
+    jstate.header.stamp = rospy.Time.now()
+    jstate.position = q
+    pub.publish(jstate)
+    bmarker.publish()
+    bmarker_des.publish()
+    marker.publish()
+
+   except ValueError as e:
+    print(f"Error: {e}")
+   
+  elif opcion == "3":  # Salir
+   print("Saliendo del programa...")
+   break
+   
+  else:
+   print("Opción inválida. Por favor, seleccione una opción válida.")   
+     
+  rate.sleep()

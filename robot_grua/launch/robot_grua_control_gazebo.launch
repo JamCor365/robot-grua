@@ -12,6 +12,9 @@
         args="joint_01_position_controller
               joint_12_position_controller
               joint_23_position_controller
+              joint_34_position_controller
+              joint_45_position_controller
+              joint_56_position_controller
               joint_state_controller"/>
 
   <!-- convert joint states to TF transforms for rviz, etc -->

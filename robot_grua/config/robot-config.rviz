@@ -7,8 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /RobotModel1
+        - /RobotModel1/Status1
         - /Marker1
-        - /Marker1/Status1
         - /Marker1/Namespaces1
       Splitter Ratio: 0.5
     Tree Height: 549
@@ -55,7 +55,7 @@ Visualization Manager:
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
       Value: true
-    - Alpha: 0.25
+    - Alpha: 0.5
       Class: rviz/RobotModel
       Collision Enabled: false
       Enabled: true
@@ -111,6 +111,7 @@ Visualization Manager:
       Marker Topic: visualization_marker
       Name: Marker
       Namespaces:
+        ball_markers: true
         frame_markers: true
       Queue Size: 100
       Value: true
@@ -142,7 +143,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 6.069163799285889
+      Distance: 3.8466296195983887
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -150,17 +151,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.8488020300865173
-        Y: 0.2247258573770523
-        Z: 4.495774269104004
+        X: -0.34474170207977295
+        Y: 1.3524454832077026
+        Z: 3.218801975250244
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.6853974461555481
+      Pitch: 0.6353974342346191
       Target Frame: <Fixed Frame>
-      Yaw: 1.8853988647460938
+      Yaw: 3.040402889251709
     Saved: ~
 Window Geometry:
   Displays:
