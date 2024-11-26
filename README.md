@@ -1,6 +1,6 @@
 # Robot Grua
 
-Este repositorio contiene la implementación de un modelo de robot grúa en ROS 2, incluyendo configuraciones, nodos y lanzadores necesarios para simular y visualizar el robot en RViz y Gazebo.
+Este repositorio contiene la implementación de un modelo de robot grúa en ROS 1, incluyendo configuraciones, nodos y lanzadores necesarios para simular y visualizar el robot en RViz y Gazebo.
 
 ## Instalación
 
@@ -74,5 +74,5 @@ roslaunch <nombre_paquete> <archivo_gazebo>.launch
 
 ## Notas adicionales
 
-- Asegúrate de tener instaladas las dependencias de ROS 2 necesarias para trabajar con RViz, Gazebo y controladores.
+- Asegúrate de tener instaladas las dependencias de ROS 1 necesarias para trabajar con RViz, Gazebo y controladores.
 - Este proyecto está en desarrollo y se expandirá con nuevos nodos y funcionalidades en futuras actualizaciones.
