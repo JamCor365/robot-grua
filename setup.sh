@@ -11,19 +11,17 @@ error() {
 
 log "Iniciando configuración del workspace..."
 
-# Obtener el directorio donde está ubicado este script
+# 1. Regresar al directorio principal del workspace y compilar con catkin_make
+log "Ejecutando catkin_make..."
+cd .. || { error "No se pudo acceder al directorio principal del workspace"; exit 1; }
 WORKSPACE_DIR=$(pwd)
-SRC_DIR="$WORKSPACE_DIR/src"
 INSTALL_DIR="$WORKSPACE_DIR/install"
 
-# 1. Regresar al directorio principal del workspace y compilar con catkin_make
-log "Ejecutando catkin_make en $WORKSPACE_DIR..."
-cd "$WORKSPACE_DIR" || { error "No se pudo acceder al directorio $WORKSPACE_DIR"; exit 1; }
 catkin_make || { error "Error durante catkin_make"; exit 1; }
 
-# 2. Clonar el repositorio rbdl dentro de src/
-log "Clonando el repositorio rbdl en $SRC_DIR..."
-cd "$SRC_DIR" || { error "No se pudo acceder al directorio $SRC_DIR"; exit 1; }
+# 2. Volver al directorio src/ y clonar el repositorio rbdl
+log "Clonando el repositorio rbdl en src/..."
+cd src || { error "No se pudo regresar al directorio src"; exit 1; }
 if [ ! -d "rbdl" ]; then
   git clone https://github.com/alexwbots/rbdl.git || { error "Error al clonar el repositorio rbdl"; exit 1; }
 else
@@ -42,7 +40,7 @@ make install || { error "Error durante make install"; exit 1; }
 # 4. Configurar el archivo ~/.bashrc
 log "Configurando ~/.bashrc..."
 BASHRC_ENTRY="source $WORKSPACE_DIR/devel/setup.bash"
-PYTHONPATH_ENTRY="export PYTHONPATH=\$PYTHONPATH:$SRC_DIR/rbdl/build/python"
+PYTHONPATH_ENTRY="export PYTHONPATH=\$PYTHONPATH:$WORKSPACE_DIR/src/rbdl/build/python"
 
 if ! grep -Fxq "$BASHRC_ENTRY" ~/.bashrc; then
   echo "$BASHRC_ENTRY" >> ~/.bashrc
@@ -63,4 +61,3 @@ log "Aplicando configuración en la sesión actual..."
 source ~/.bashrc || { error "Error al cargar ~/.bashrc"; exit 1; }
 
 log "¡Configuración completada con éxito!"
-
