@@ -22,18 +22,18 @@ if __name__ == '__main__':
  # Initial Joint Configuration
  q0 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
  # Velocidad inicial
- dq0 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+ dq0 = np.array([0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
  
  
  # Loop rate (in Hz)
- freq = 20
+ freq = 10
 
  # Simulador dinamico del robot
  #robot = Robot(q0, dq0, ndof, dt)
  
  # Se definen las ganancias del controlador
- Kp = np.diag([5.0, 5.0, 5.0, 5.0, 5.0, 1.0])  # Ajusta según la respuesta deseada
- Kd = np.diag([2.0, 2.0, 2.0, 1.0, 1.0, 0.5])  # Ajusta según la respuesta deseada
+ Kp = np.diag([300.0, 400.0, 400.0, 500.0, 100.0, 100.0])  # Ajusta según la respuesta deseada
+ Kd = np.diag([30.0, 10.0, 20.0, 10.0, 5.0, 5.0])  # Ajusta según la respuesta deseada
  
  
  while True:
@@ -86,19 +86,21 @@ if __name__ == '__main__':
   elif opcion == "3":  # Control Diferencial
    print("\n--- CONTROL DIFERENCIAL ---")
    try:
-    print("Ingrese la posicion deseada (x, y, z) y la ganancia k separados por espacio:")
+    print("Ingrese la posicion deseada (x, y, z) y las ganancias k_pos, k_ori  separados por espacio:")
     v_input = input()  # Lee la entrada del usuario
     v = np.array([float(val) for val in v_input.split()])
     xd = v[0:3]
-    k = v[3]
-    if len(v) != 4:
-     raise ValueError("Deben ser cuatro valores: x, y, z, k.")
+    k_pos = v[3]
+    k_ori = v[4]
+    q = ikine(xd, q0)
+    T = fkine(q)
+    xd = TF2xyzquat(T)
+    if len(v) != 5:
+     raise ValueError("Deben ser cinco valores: x, y, z, k_pos, k_ori.")
     
     # Control kinematics 
-    q = diffkine(xd, q0, k, freq)
+    q = diffkine(xd, q0, k_pos, k_ori, freq)
 
-    # Resulting position (end effector with respect to the base link)
-    T = fkine(q)
     print('Data cargada')
     break
 

@@ -1,6 +1,7 @@
 import numpy as np
 from copy import copy
 import rbdl
+from pyquaternion import Quaternion
 
 cos=np.cos; sin=np.sin; pi=np.pi
 
@@ -93,6 +94,38 @@ def jacobian(q, delta=0.0001):
   J[0:3,i]=(T_inc[0:3,3]-T[0:3,3])/delta
  return J
  
+def jacobian_full_quat(q, delta=0.0001):
+ n = q.size
+ J = np.zeros((6, n))
+ T = fkine(q)
+ x_current = T[0:3, 3]
+ R_current = T[0:3, 0:3]
+ q_current = rot2quat(R_current)
+
+ for i in range(n):
+  dq = copy(q)
+  dq[i] += delta
+  T_inc = fkine(dq)
+  x_inc = T_inc[0:3, 3]
+  R_inc = T_inc[0:3, 0:3]
+  q_inc = rot2quat(R_inc)
+
+  # Diferencia en posición
+  dx = (x_inc - x_current) / delta
+
+  # Diferencia en orientación (cuaterniones)
+  q_diff = Quaternion(q_inc) * Quaternion(q_current).inverse
+  dq_quat = np.array([q_diff.w, q_diff.x, q_diff.y, q_diff.z]) / delta
+  # Usar la parte vectorial escalada
+  dq_quat_vec = dq_quat[1:] * 2  # Factor 2 por la derivada
+
+  # Llenar el Jacobiano
+  J[0:3, i] = dx
+  J[3:6, i] = dq_quat_vec
+
+ return J
+
+ 
 def ikine(xdes, q0):
  """
  Calcular la cinematica inversa de un brazo robotico numericamente a partir 
@@ -125,13 +158,13 @@ def ikine(xdes, q0):
  print("Max iterations reached without convergence.")  
  return q
  
-def diffkine(xd, q0, k, freq):
+def diffkine(xd, q0, k_pos, k_ori, freq):
  """
  Control diferencial para alcanzar una posición deseada, con registro de datos.
  Guarda los valores de posición actual, posición deseada y configuración articular en archivos.
  """
     
- epsilon  = 0.001
+ epsilon  = 1e-6
  max_iter = 1000
  # Configuración inicial
  q = copy(q0)
@@ -141,31 +174,64 @@ def diffkine(xd, q0, k, freq):
  fxcurrent = open("./Data/Control_Diferencial/xcurrent.txt", "w")
  fxdesired = open("./Data/Control_Diferencial/xdesired.txt", "w")
  fq = open("./Data/Control_Diferencial/q.txt", "w")
+ 
+ # Definir límites articulares
+ q_min = [-3.1, 0, -0.87, 0, -0.25, -3.1]
+ q_max = [3.1, 0.7, 0.52, 1, 0.25, 3.1]
 
  # Inicializar bucle de control
  for _ in range(max_iter):
   # Transformación homogénea actual
   T = fkine(q)
-  x = T[0:3, 3]  # Posición actual del efector final
+  x_current = T[0:3, 3]  # Posición actual del efector final
+  R_current = T[0:3, 0:3]
+  
+  # Convertir orientación actual a cuaternión
+  q_current = rot2quat(R_current)
 
-  # Error
-  e = xd - x
-  if np.linalg.norm(e) < epsilon:
-   print("Error suficientemente pequeño, convergencia alcanzada.")
+  # Estado actual del efector final
+  x = np.hstack((x_current, q_current))
+
+  # Calcular el error de pose
+  err_pose = PoseError(x, xd)
+
+  # Separar errores de posición y orientación
+  ep = err_pose[0:3]
+  eo = err_pose[3:7]
+
+  # Usar solo la parte vectorial del cuaternión de error para pequeñas rotaciones
+  eo_vec = eo[1:]  # Suponiendo que eo[0] es el componente escalar (w)
+
+  # Condición de convergencia
+  if np.linalg.norm(ep) < epsilon and np.linalg.norm(eo_vec) < epsilon:
+   print("Convergencia alcanzada.")
    break
 
-  # Velocidad cartesiana deseada
-  dx_star = -k * e
+  # Matriz de ganancias
+  k_pos_vec = np.full(3, k_pos)
+  k_ori_vec = np.full(3, k_ori)
+  k_vec = np.concatenate((k_pos_vec, k_ori_vec))
+  K = np.diag(k_vec)
 
-  # Jacobiano y su pseudo-inversa
-  J = jacobian(q)
-  J_pinv = np.linalg.pinv(J)
+  # Error combinado
+  e = np.concatenate((ep, eo_vec))
+
+  # Velocidad cartesiana deseada
+  dx_star = -K @ e
+
+  # Jacobiano completo
+  J = jacobian_full_quat(q)
 
   # Calcular velocidades articulares
-  dq = J_pinv @ dx_star
+  dq = np.linalg.pinv(J, rcond=1e-6) @ dx_star
 
-  # Actualizar configuración articular usando delta_t
+  # Limitar las velocidades articulares si es necesario
+  max_joint_velocity = 1.0  # rad/s
+  dq = np.clip(dq, -max_joint_velocity, max_joint_velocity)
+
+  # Actualizar configuración articular
   q += dt * dq
+  q = np.clip(q, q_min, q_max)
 
   # Guardar datos en los archivos
   fxcurrent.write(f"{x[0]} {x[1]} {x[2]}\n")
@@ -189,6 +255,10 @@ def dynamic_control(q0, dq0, qdes, Kp, Kd, modelo, freq):
  ndof = len(q0)   # Grados de libertad
  q = copy(q0)  # Configuración inicial
  dq =copy(dq0)  # Velocidad inicial
+ 
+ # Definir límites articulares
+ q_min = np.array([-3.1, 0, -0.87, 0, -0.25, -3.1])
+ q_max = np.array([3.1, 0.7, 0.52, 1, 0.25, 3.1])
 
  # Archivos para guardar datos
  fqact = open("./Data/Control_Dinamico/qactual.txt", "w")
@@ -208,10 +278,16 @@ def dynamic_control(q0, dq0, qdes, Kp, Kd, modelo, freq):
 
   # Control de torque
   u = np.dot(Kp, (qdes - q)) - np.dot(Kd, dq) + g
+  
+  # Calcular aceleraciones articulares mediante dinámica directa
+  ddq = np.zeros(ndof)
+  rbdl.ForwardDynamics(modelo, q, dq, u, ddq)
 
   # Actualizar velocidades y posiciones articulares
-  dq += dt * u
+  dq += dt * ddq
+  dq = np.clip(dq, -2.0, 2.0)  # Limitar las velocidades articulares (rad/s)
   q += dt * dq
+  q = np.clip(q, q_min, q_max)  # Aplicar límites articulares
 
   # Calcular posición actual del efector final
   x = fkine(q)[0:3, 3]
@@ -285,3 +361,21 @@ def TF2xyzquat(T):
  quat = rot2quat(T[0:3,0:3])
  res = [T[0,3], T[1,3], T[2,3], quat[0], quat[1], quat[2], quat[3]]
  return np.array(res)
+ 
+def PoseError(x,xd):
+ """
+ Determine the pose error of the end effector.
+
+ Input:
+ x -- Actual position of the end effector, in the format [x y z ew ex ey ez]
+ xd -- Desire position of the end effector, in the format [x y z ew ex ey ez]
+ Output:
+ err_pose -- Error position of the end effector, in the format [x y z ew ex ey ez]
+ """
+ pos_err = x[0:3]-xd[0:3]
+ qact = Quaternion(x[3:7])
+ qdes = Quaternion(xd[3:7])
+ qdif =  qdes*qact.inverse
+ qua_err = np.array([qdif.w,qdif.x,qdif.y,qdif.z])
+ err_pose = np.hstack((pos_err,qua_err))
+ return err_pose

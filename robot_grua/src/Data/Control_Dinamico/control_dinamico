@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+
+import rospy
+from sensor_msgs.msg import JointState
+from markers import *
+import numpy as np
+import time
+
+def read_data(filename):
+    """Leer datos de un archivo txt y devolver un array numpy."""
+    data = []
+    with open(filename, 'r') as f:
+        for line in f:
+            values = list(map(float, line.strip().split()))
+            data.append(values)
+    return np.array(data)
+
+if __name__ == "__main__":
+    # Inicializar nodo
+    rospy.init_node("dynamic_control_simulation")
+
+    # Publicador para el estado de las articulaciones
+    pub = rospy.Publisher("joint_states", JointState, queue_size=10)
+
+    # Marcadores para posiciones
+    bmarker_current = BallMarker(color['PINK'])  # Posición actual
+    bmarker_desired = BallMarker(color['CYAN'])  # Posición deseada
+
+    # Leer datos de los archivos
+    file_q_actual = "./qactual.txt"
+    file_x_actual = "./xactual.txt"
+    file_x_desired = "./xdeseado.txt"
+
+    q_actual = read_data(file_q_actual)
+    x_actual = read_data(file_x_actual)
+    x_desired = read_data(file_x_desired)
+
+    # Definir nombres de las articulaciones
+    jnames = ['joint_01', 'joint_12', 'joint_23', 'joint_34', 'joint_45', 'joint_56']
+
+    # Mensaje de JointState
+    jstate = JointState()
+    jstate.name = jnames
+    jstate.position = [0.0] * len(jnames)
+
+    # Frecuencia de simulación
+    freq = 10  # Hz
+    rate = rospy.Rate(freq)
+
+    # Simular los datos
+    for i in range(len(q_actual)):
+        # Actualizar el tiempo de ROS
+        jstate.header.stamp = rospy.Time.now()
+        #jstate.header.stamp = rospy.Time.from_sec(q_actual[i, 0])
+        jstate.position = q_actual[i, 1:]  # Saltar la primera columna (tiempo)
+
+        # Publicar estado articular
+        pub.publish(jstate)
+
+        # Publicar marcadores
+        bmarker_current.xyz(x_actual[i, 1:])  # Saltar la primera columna (tiempo)
+        bmarker_desired.xyz(x_desired[i, 1:])  # Saltar la primera columna (tiempo)
+
+        bmarker_current.publish()
+        bmarker_desired.publish()
+
+        # Pausar para mantener la frecuencia
+        rate.sleep()
+
+    print("Simulación dinámica en RViz completada.")
+

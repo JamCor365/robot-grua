@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+import rospy
+from sensor_msgs.msg import JointState
+from markers import *
+import time
+
+def simulate_motion():
+    rospy.init_node("simulate_motion_rviz")
+    pub = rospy.Publisher('joint_states', JointState, queue_size=10)
+    bmarker_current = BallMarker(color['PINK'])
+    bmarker_desired = BallMarker(color['CYAN'])
+
+    # Archivos de datos
+    file_current = "./xcurrent.txt"
+    file_desired = "./xdesired.txt"
+    file_q = "./q.txt"
+
+    # Leer datos de los archivos
+    def read_data(filename):
+        data = []
+        with open(filename, 'r') as f:
+            for line in f:
+                values = list(map(float, line.strip().split()))
+                data.append(values)
+        return np.array(data)
+
+    xcurrent = read_data(file_current)
+    xdesired = read_data(file_desired)
+    qdata = read_data(file_q)
+
+    # Nombres de las articulaciones
+    jnames = ['joint_01', 'joint_12', 'joint_23', 'joint_34', 'joint_45', 'joint_56']
+
+    # Configuración inicial
+    jstate = JointState()
+    jstate.name = jnames
+
+    freq = 10  # Frecuencia en Hz
+    rate = rospy.Rate(freq)
+
+    for i in range(len(xcurrent)):
+        # Actualizar tiempo
+        jstate.header.stamp = rospy.Time.now()
+        # Configuración articular
+        jstate.position = qdata[i]
+
+        # Publicar posición deseada y actual
+        bmarker_current.xyz(xcurrent[i])
+        bmarker_desired.xyz(xdesired[i])
+        pub.publish(jstate)
+        bmarker_current.publish()
+        bmarker_desired.publish()
+        
+        #time.sleep(0.1)  # Espera adicional para ralentizar más el movimiento
+        rate.sleep()
+
+    print("Simulación completada.")
+
+if __name__ == "__main__":
+    simulate_motion()
+
